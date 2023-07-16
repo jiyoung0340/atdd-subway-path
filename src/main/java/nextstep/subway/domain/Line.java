@@ -59,5 +59,18 @@ public class Line {
     }
 
     public void addSection(Station upStation, Station downStation, int distance) {
+        Section section = new Section(upStation, downStation, distance);
+        this.sections.add(section);
+    }
+
+    public void removeSection(Long sectionId) {
+        List<Section> list = this.sections;
+
+        for(Section section : list) {
+            if(section.getId() == sectionId) {
+                list.remove(section);
+                break;
+            }
+        }
     }
 }

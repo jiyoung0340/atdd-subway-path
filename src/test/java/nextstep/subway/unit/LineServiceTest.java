@@ -9,45 +9,41 @@ import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
+import org.springframework.test.annotation.DirtiesContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
+@SpringBootTest
 @ExtendWith(MockitoExtension.class)
 public class LineServiceTest {
-    @Mock
+
+    @Autowired
     private StationRepository stationRepository;
-    @Mock
+
+    @Autowired
     private LineRepository lineRepository;
 
+    @Autowired
+    private LineService lineService;
+
     @Test
+    @DirtiesContext
     void addSection() {
         // given
-        // stationRepository와 lineRepository를 활용하여 초기값 셋팅
-        long lineId = 1L;
-        long upStationId = 1L;
-        long downStationId = 2L;
+        Station 왕십리 = stationRepository.save(new Station("왕십리"));
+        Station 잠실 = stationRepository.save(new Station("잠실"));
+        Line 이호선 = lineRepository.save(new Line("2호선", "green"));
         int distance = 10;
-
-        SectionRequest sectionRequest = new SectionRequest(upStationId, downStationId, distance);
-        LineService lineService = new LineService(lineRepository, stationRepository);
-        when(lineRepository.findById(lineId)).thenReturn(Optional.of(new Line("2호선", "green")));
-        when(stationRepository.findById(upStationId)).thenReturn(Optional.of(new Station("상행역")));
-        when(stationRepository.findById(downStationId)).thenReturn(Optional.of(new Station("히행역")));
-
         // when
-        // lineService.addSection 호출
-        LineResponse lineResponse = lineService.addSection(lineId, sectionRequest);
+        SectionRequest sectionRequest = new SectionRequest(왕십리.getId(), 잠실.getId(), distance);
+        LineResponse lineResponse = lineService.addSection(이호선.getId(), sectionRequest);
 
         // then
-        // line.getSections 메서 드를 통해 검증
-        assertThat(lineResponse.getId()).isNotNull();
+        assertThat(이호선.getId()).isEqualTo(lineResponse.getId());
     }
+
+
 }
